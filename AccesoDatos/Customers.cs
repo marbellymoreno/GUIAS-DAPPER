@@ -20,5 +20,4 @@ namespace AccesoDatos
         public string Phone { get; set; }
         public string Fax { get; set; }
     }
-
 }
