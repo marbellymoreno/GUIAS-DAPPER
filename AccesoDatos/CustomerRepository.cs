@@ -1,7 +1,9 @@
 ﻿using Dapper;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -9,34 +11,36 @@ namespace AccesoDatos
 {
     public class CustomerRepository
     {
-        public List<Customers> ObtenerTodo()
+        public List<Customers> ObtenerTodos()
         {
             using (var conexion = DataBase.GetSqlConnection())
             {
-                string selectAll = "";
-                selectAll = selectAll + "SELECT [CustomerID] " + "\n";
-                selectAll = selectAll + "      ,[CompanyName] " + "\n";
-                selectAll = selectAll + "      ,[ContactName] " + "\n";
-                selectAll = selectAll + "      ,[ContactTitle] " + "\n";
-                selectAll = selectAll + "      ,[Address] " + "\n";
-                selectAll = selectAll + "      ,[City] " + "\n";
-                selectAll = selectAll + "      ,[Region] " + "\n";
-                selectAll = selectAll + "      ,[PostalCode] " + "\n";
-                selectAll = selectAll + "      ,[Country] " + "\n";
-                selectAll = selectAll + "      ,[Phone] " + "\n";
-                selectAll = selectAll + "      ,[Fax] " + "\n";
-                selectAll = selectAll + "  FROM [dbo].[Customers]";
 
-                var clientes = conexion.Query<Customers>(selectAll).ToList();
-                return clientes;
+                String sqlSelectAll = "";
+                sqlSelectAll = sqlSelectAll + "SELECT [CustomerID] " + "\n";
+                sqlSelectAll = sqlSelectAll + "      ,[CompanyName] " + "\n";
+                sqlSelectAll = sqlSelectAll + "      ,[ContactName] " + "\n";
+                sqlSelectAll = sqlSelectAll + "      ,[ContactTitle] " + "\n";
+                sqlSelectAll = sqlSelectAll + "      ,[Address] " + "\n";
+                sqlSelectAll = sqlSelectAll + "      ,[City] " + "\n";
+                sqlSelectAll = sqlSelectAll + "      ,[Region] " + "\n";
+                sqlSelectAll = sqlSelectAll + "      ,[PostalCode] " + "\n";
+                sqlSelectAll = sqlSelectAll + "      ,[Country] " + "\n";
+                sqlSelectAll = sqlSelectAll + "      ,[Phone] " + "\n";
+                sqlSelectAll = sqlSelectAll + "      ,[Fax] " + "\n";
+                sqlSelectAll = sqlSelectAll + "  FROM [dbo].[Customers]";
+
+                var cliente = conexion.Query<Customers>(sqlSelectAll).ToList();
+                return cliente;
             }
         }
-
         public Customers ObtenerPorID(string id)
         {
+
             using (var conexion = DataBase.GetSqlConnection())
             {
-                string selectPorID = "";
+
+                String selectPorID = "";
                 selectPorID = selectPorID + "SELECT [CustomerID] " + "\n";
                 selectPorID = selectPorID + "      ,[CompanyName] " + "\n";
                 selectPorID = selectPorID + "      ,[ContactName] " + "\n";
@@ -49,13 +53,13 @@ namespace AccesoDatos
                 selectPorID = selectPorID + "      ,[Phone] " + "\n";
                 selectPorID = selectPorID + "      ,[Fax] " + "\n";
                 selectPorID = selectPorID + "  FROM [dbo].[Customers] " + "\n";
-                selectPorID = selectPorID + "  WHERE CustomerID = @CustomerID";  // Corregido aquí, eliminando el corchete final innecesario
+                selectPorID = selectPorID + "  WHERE CustomerID = @CustomerID";
 
-                var cliente = conexion.QueryFirstOrDefault<Customers>(selectPorID, new { CustomerID = id });
-                return cliente;
+                var Cliente = conexion.QueryFirstOrDefault<Customers>(selectPorID, new { CustomerID = id });
+                return Cliente;
             }
-        }
 
+        }
         public int insertarCliente(Customers customer)
         {
             using (var conexion = DataBase.GetSqlConnection())
@@ -73,16 +77,59 @@ namespace AccesoDatos
                 Insertar = Insertar + "           ,@contactName " + "\n";
                 Insertar = Insertar + "           ,@contactTitle " + "\n";
                 Insertar = Insertar + "           ,@address)";
-
                 var insertadas = conexion.Execute(Insertar, new
                 {
-                    customerID = customer.CustomerID,
+                    CustomerID = customer.CustomerID,
                     CompanyName = customer.CompanyName,
                     ContactName = customer.ContactName,
                     ContactTitle = customer.ContactTitle,
                     Address = customer.Address,
                 });
                 return insertadas;
+            }
+        }
+        public int AcctualizarCliente(Customers customers)
+        {
+            using (var conexion = DataBase.GetSqlConnection())
+            {
+                String UpdateCustomer = "";
+                UpdateCustomer = UpdateCustomer + "UPDATE [dbo].[Customers] " + "\n";
+                UpdateCustomer = UpdateCustomer + "   SET [CustomerID] = @CustomerID " + "\n";
+                UpdateCustomer = UpdateCustomer + "      ,[CompanyName] = @CompanyName " + "\n";
+                UpdateCustomer = UpdateCustomer + "      ,[ContactName] = @ContactName " + "\n";
+                UpdateCustomer = UpdateCustomer + "      ,[ContactTitle] = @ContactTitle " + "\n";
+                UpdateCustomer = UpdateCustomer + "      ,[Address] = @Address " + "\n";
+                UpdateCustomer = UpdateCustomer + " WHERE CustomerID = @CustomerID";
+
+
+                var actualizadas =
+                    conexion.Execute(UpdateCustomer, new
+                    {
+                        CustomerID = customers.CustomerID,
+                        CompanyName = customers.CompanyName,
+                        ContactName = customers.ContactName,
+                        ContactTitle = customers.ContactTitle,
+                        Address = customers.Address
+                    });
+                return actualizadas;
+            }
+        }
+
+        public int EliminarCliente(string Id)
+        {
+
+            using (var conexion = DataBase.GetSqlConnection())
+            {
+
+                String Delete = "";
+                Delete = Delete + "DELETE FROM [dbo].[Customers] " + "\n";
+                Delete = Delete + "      WHERE CustomerID = @CustomerID";
+
+                var eliminadas = conexion.Execute(Delete, new
+                {
+                    CustomerID = Id
+                });
+                return eliminadas;
             }
         }
     }
