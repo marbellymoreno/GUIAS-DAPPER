@@ -84,10 +84,11 @@ namespace DapperDemo
 
         }
 
-        private void btnEliminar_Click(object sender, EventArgs e)
+        private void btnEliminar_Click_1(object sender, EventArgs e)
         {
             var eliminadas = customerR.EliminarCliente(tboxObtenerID.Text);
             MessageBox.Show($"Se ha eliminado {eliminadas} filas de manera correcta");
+            dgvObtenerTodos.DataSource = customerR.ObtenerTodos();
         }
     }
 }
